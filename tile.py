@@ -26,9 +26,13 @@ class Tile():
         
         self.tile = pygame.Rect(self.x, self.y, self.width, self.height)
         self.topWall = pygame.Rect(self.x, self.y, self.width, 1)
+        self.hasTopWall = True
         self.bottomWall = pygame.Rect(self.x, self.y + self.height, self.width, 1)
+        self.hasBottomWall = True
         self.leftWall = pygame.Rect(self.x, self.y, 1, self.height)
+        self.hasLeftWall = True
         self.rightWall = pygame.Rect(self.x + self.width, self.y, 1, self.height)
+        self.hasRightWall = True
 
     def update(self):
         self.tile.x = self.x
@@ -44,7 +48,11 @@ class Tile():
         
     def draw(self):
         pygame.draw.rect(self.screen, self.color, self.tile)
-        pygame.draw.rect(self.screen, (0, 0, 0), self.topWall)
-        pygame.draw.rect(self.screen, (0, 0, 0), self.bottomWall)
-        pygame.draw.rect(self.screen, (0, 0, 0), self.leftWall)
-        pygame.draw.rect(self.screen, (0, 0, 0), self.rightWall)
+        if self.hasTopWall:
+            pygame.draw.rect(self.screen, (0, 0, 0), self.topWall)
+        if self.hasBottomWall:
+            pygame.draw.rect(self.screen, (0, 0, 0), self.bottomWall)
+        if self.hasLeftWall:
+            pygame.draw.rect(self.screen, (0, 0, 0), self.leftWall)
+        if self.hasRightWall:
+            pygame.draw.rect(self.screen, (0, 0, 0), self.rightWall)

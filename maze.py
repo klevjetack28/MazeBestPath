@@ -3,6 +3,41 @@ import random
 
 from tile import Tile, Type
 
+path = []
+
+def solveMaze(grid, currentTile, endTile, visited = []):
+    if currentTile == endTile:
+        path.insert(0, currentTile.id)
+        return True
+    visited.append(currentTile)
+    currentTile.visited = True
+
+    neighbors = []
+
+    # checking if neighbors are in bounds for neighbor up, down, left, right
+    # if neighbor is in bounds, add it to neighbors list
+    if currentTile.id - 32 >= 0:
+        if not currentTile.hasTopWall:
+            neighbors.append(getTileByID(grid, currentTile.id - 32))
+    if currentTile.id + 32 < 768:
+        if not currentTile.hasBottomWall:
+            neighbors.append(getTileByID(grid, currentTile.id + 32))
+    if currentTile.id - 1 >= 0 and currentTile.id % 32 != 0:
+        if not currentTile.hasLeftWall:
+            neighbors.append(getTileByID(grid, currentTile.id - 1))
+    if currentTile.id + 1 < 768 and currentTile.id % 32 != 31:
+        if not currentTile.hasRightWall:
+            neighbors.append(getTileByID(grid, currentTile.id + 1))
+
+    for neighbor in neighbors:
+        if neighbor not in visited:
+            if(solveMaze(grid, neighbor, endTile, visited)):
+                path.insert(0, currentTile.id)
+                return True
+
+    return False
+    
+
 def backtrackingMaze(grid, currentTile, visited = []):
     # adding current tile to visited list
     visited.append(currentTile)
@@ -13,7 +48,7 @@ def backtrackingMaze(grid, currentTile, visited = []):
 
     # generating neighbors
     neighbors = []
-    
+
     # checking if neighbors are in bounds for neighbor up, down, left, right
     # if neighbor is in bounds, add it to neighbors list
     if currentTile.id - 32 >= 0:
@@ -33,18 +68,19 @@ def backtrackingMaze(grid, currentTile, visited = []):
         # if neighbor is not visited, remove wall between current tile and neighbor
         if neighbor not in visited:
             if neighbor.id == currentTile.id - 32:
-                # removing walls but setting them to 0, 0, 0, 0 so they are not drawn
-                currentTile.topWall = pygame.Rect(0, 0, 0, 0)
-                neighbor.bottomWall = pygame.Rect(0, 0, 0, 0)
+                currentTile.hasTopWall = False
+                neighbor.hasBottomWall = False
             elif neighbor.id == currentTile.id + 32:
-                currentTile.bottomWall = pygame.Rect(0, 0, 0, 0)
-                neighbor.topWall = pygame.Rect(0, 0, 0, 0)
+                currentTile.hasBottomWall = False
+                neighbor.hasTopWall = False
             elif neighbor.id == currentTile.id - 1:
-                currentTile.leftWall = pygame.Rect(0, 0, 0, 0)
-                neighbor.rightWall = pygame.Rect(0, 0, 0, 0)
+                currentTile.hasLeftWall = False
+                neighbor.hasRightWall = False
             elif neighbor.id == currentTile.id + 1:
-                currentTile.rightWall = pygame.Rect(0, 0, 0, 0)
-                neighbor.leftWall = pygame.Rect(0, 0, 0, 0)
+                currentTile.hasRightWall = False
+                neighbor.hasLeftWall = False
+            
+            #call recursion
             backtrackingMaze(grid, neighbor, visited)
 
 def getTileByID(grid, id):
@@ -82,7 +118,7 @@ class Maze():
         self.y = 0
         self.size = 20
 
-        # screen height / tilse size = 24
+        # screen height / tile size = 24
         self.rows = 24
         # screen width / tile size = 32
         self.cols = 32
@@ -105,6 +141,9 @@ class Maze():
         # setting start and end tiles
         self.grid[0][0].type = Type.START
         self.grid[23][31].type = Type.END
+
+        solveMaze(self.grid, self.grid[0][0], self.grid[23][31])
+        print(path)
 
         # setting colors
         setColor(self.grid)
@@ -135,6 +174,8 @@ class Maze():
         # updating tiles
         for row in self.grid:
             for tile in row:
+                if tile.id in path:
+                    tile.color = (255, 156, 212)
                 tile.update()
 
     def draw(self):
