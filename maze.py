@@ -166,8 +166,10 @@ class Maze():
 
         # creating new maze if spacebar is pressed
         if spacebarPress:
-            backtrackingMaze(self.grid, getTileByID(self.grid, ))
+            backtrackingMaze(self.grid, getTileByID(self.grid, random.randint(0, 767)))
             setColor(self.grid)
+            solveMaze(self.grid, self.grid[0][0], self.grid[23][31])
+            print(path)
     
     def update(self):
 
